@@ -4,13 +4,15 @@ interface Props {
   description: string;
   ogImage?: string;
   canonicalUrl?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title,
   description,
-  ogImage = '/og-default.png',
+  ogImage = '/og-default.svg',
   canonicalUrl,
+  jsonLd,
 } = Astro.props;
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://faatikhriziq.my.id';
@@ -23,16 +25,23 @@ const resolvedCanonical = canonicalUrl ?? Astro.url.href;
 <meta name="generator" content={Astro.generator} />
 <title>{title}</title>
 <meta name="description" content={description} />
+<meta name="author" content="Faatikh Riziq" />
 <link rel="canonical" href={resolvedCanonical} />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content={resolvedCanonical} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={resolvedOgImage} />
+<meta property="og:site_name" content="Faatikh Riziq" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={resolvedOgImage} />
 <meta name="theme-color" content="#0A0A0B" />
+{jsonLd && (
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+)}

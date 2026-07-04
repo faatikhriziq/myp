@@ -15,9 +15,34 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://faatikhriziq.my.id';
+
+const blogPostingJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  author: {
+    '@type': 'Person',
+    name: 'Faatikh Riziq',
+    url: siteUrl,
+  },
+  publisher: {
+    '@type': 'Person',
+    name: 'Faatikh Riziq',
+    url: siteUrl,
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': Astro.url.href,
+  },
+  keywords: tags.join(', '),
+};
 ---
 
-<BaseLayout title={`${title} — Faatikh Riziq`} description={description}>
+<BaseLayout title={`${title} — Faatikh Riziq`} description={description} jsonLd={blogPostingJsonLd}>
   <article class="blog-post section">
     <div class="container">
       <header class="blog-post__header">

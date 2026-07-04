@@ -9,11 +9,27 @@ const techStack = [
   'Docker', 'Git', 'Linux', 'gRPC', 'REST',
   'PostGIS', 'CI/CD', 'Terraform', 'Astro',
 ];
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Faatikh Riziq',
+  url: 'https://faatikhriziq.my.id',
+  jobTitle: 'Software Engineer',
+  description: 'Software engineer focused on building reliable, well-architected systems.',
+  sameAs: [
+    'https://github.com/faatikhriziq',
+    'https://linkedin.com/in/faatikhriziq',
+    'https://x.com/faatikhriziq',
+  ],
+  knowsAbout: ['Software Architecture', 'System Design', 'Go', 'PostgreSQL', 'Backend Engineering'],
+};
 ---
 
 <BaseLayout
   title="Faatikh Riziq — Software Engineer"
   description="Software engineer focused on building reliable, well-architected systems. Experienced in production-grade backend systems, system design, and software architecture."
+  jsonLd={personJsonLd}
 >
   <!-- Hero -->
   <section class="hero section">

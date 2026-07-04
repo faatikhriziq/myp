@@ -8,15 +8,16 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, jsonLd } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <SEOHead title={title} description={description} ogImage={ogImage} />
+    <SEOHead title={title} description={description} ogImage={ogImage} jsonLd={jsonLd} />
   </head>
   <body>
     <Header />
