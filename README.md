@@ -1,46 +1,56 @@
-# Astro Starter Kit: Basics
+# faatikhriziq.my.id
+
+Personal portfolio & blog built with [Astro](https://astro.build), deployed on [Cloudflare Pages](https://pages.cloudflare.com).
+
+## Local Development
 
 ```sh
-pnpm create astro@latest -- --template basics
+pnpm install
+pnpm dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Dev server runs at `http://localhost:4321`.
 
-## 🚀 Project Structure
+## Build
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```sh
+pnpm build
+pnpm preview
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Deploy to Cloudflare Pages
 
-## 🧞 Commands
+1. Push this repo to GitHub
+2. Go to [Cloudflare Pages](https://dash.cloudflare.com/?to=/:account/pages) and create a new project
+3. Connect your GitHub repo
+4. Set build settings:
+   - **Build command:** `pnpm build`
+   - **Build output directory:** `dist`
+   - **Node.js version:** `22` (set via environment variable `NODE_VERSION`)
+5. Add custom domain `faatikhriziq.my.id` in the Pages project settings
 
-All commands are run from the root of the project, from a terminal:
+## Blog
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+Blog posts live in `src/content/blog/` as `.md` or `.mdx` files.
 
-## 👀 Want to learn more?
+Frontmatter schema:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```yaml
+---
+title: "Post Title"
+description: "Short description"
+pubDate: 2025-06-15
+tags: ["tag1", "tag2"]
+draft: false
+---
+```
+
+Set `draft: true` to hide a post from the published listing.
+
+## Stack
+
+- Astro (static output)
+- @astrojs/cloudflare adapter
+- @astrojs/sitemap
+- @astrojs/mdx
+- Self-hosted Inter & JetBrains Mono fonts

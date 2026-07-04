@@ -1,0 +1,139 @@
+---
+const lines = [
+  '$ whoami',
+  'faatikh-riziq',
+  '$ cat role.txt',
+  'Software Engineer',
+  '$ grep -r "passion" ./life',
+  'Building systems that scale.',
+];
+---
+
+<div class="terminal" aria-hidden="true">
+  <div class="terminal__bar">
+    <span class="terminal__dot terminal__dot--red"></span>
+    <span class="terminal__dot terminal__dot--yellow"></span>
+    <span class="terminal__dot terminal__dot--green"></span>
+    <span class="terminal__title">~/faatikhriziq</span>
+  </div>
+  <div class="terminal__body">
+    {lines.map((line, i) => (
+      <div
+        class:list={[
+          'terminal__line',
+          { 'terminal__line--command': line.startsWith('$') },
+          { 'terminal__line--output': !line.startsWith('$') },
+        ]}
+        style={`animation-delay: ${i * 0.4}s`}
+      >
+        {line.startsWith('$') ? (
+          <>
+            <span class="terminal__prompt">$</span>
+            <span class="terminal__text">{line.slice(2)}</span>
+          </>
+        ) : (
+          <span class="terminal__text">{line}</span>
+        )}
+      </div>
+    ))}
+    <div class="terminal__cursor" style={`animation-delay: ${lines.length * 0.4}s`}>
+      <span class="terminal__prompt">$</span>
+      <span class="terminal__blink">_</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .terminal {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 480px;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .terminal__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .terminal__dot--red { background: #FF5F57; }
+  .terminal__dot--yellow { background: #FEBC2E; }
+  .terminal__dot--green { background: #28C840; }
+
+  .terminal__title {
+    margin-left: 0.5rem;
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+  }
+
+  .terminal__body {
+    padding: 1rem;
+    min-height: 160px;
+  }
+
+  .terminal__line {
+    opacity: 0;
+    animation: terminalFadeIn 0.3s ease forwards;
+    margin-bottom: 0.25rem;
+    line-height: 1.8;
+  }
+
+  .terminal__prompt {
+    color: var(--terminal-green);
+    margin-right: 0.5rem;
+    user-select: none;
+  }
+
+  .terminal__line--command .terminal__text {
+    color: var(--text-primary);
+  }
+
+  .terminal__line--output .terminal__text {
+    color: var(--accent);
+  }
+
+  .terminal__cursor {
+    opacity: 0;
+    animation: terminalFadeIn 0.3s ease forwards;
+  }
+
+  .terminal__blink {
+    color: var(--text-primary);
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes terminalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .terminal {
+      font-size: 0.75rem;
+    }
+  }
+</style>

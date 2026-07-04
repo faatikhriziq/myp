@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title="Blog — Faatikh Riziq"
+  description="Thoughts on software engineering, system design, architecture decisions, and lessons from building production systems."
+>
+  <section class="section">
+    <div class="container">
+      <span class="section-label">Blog</span>
+      <h1 class="section-title">Writing</h1>
+      <p class="blog-index__intro">
+        Notes on engineering decisions, system design, and things I learn along the way.
+      </p>
+      {posts.length === 0 ? (
+        <p class="blog-index__empty">No posts yet. Check back soon.</p>
+      ) : (
+        <div class="blog-index__grid">
+          {posts.map((post) => (
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              tags={post.data.tags}
+              slug={post.id}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-index__intro {
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    max-width: 520px;
+  }
+
+  .blog-index__empty {
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .blog-index__grid {
+    display: grid;
+    gap: 1rem;
+  }
+</style>

@@ -1,0 +1,28 @@
+---
+import SEOHead from '../components/SEOHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+
+const { title, description, ogImage } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SEOHead title={title} description={description} ogImage={ogImage} />
+  </head>
+  <body>
+    <Header />
+    <main id="main" style={`padding-top: var(--header-height)`}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

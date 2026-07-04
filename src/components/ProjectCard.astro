@@ -1,0 +1,109 @@
+---
+import TechBadge from './TechBadge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  stack: string[];
+  highlights: string[];
+  href?: string;
+  linkLabel?: string;
+}
+
+const { title, description, stack, highlights, href, linkLabel = 'View project' } = Astro.props;
+---
+
+<article class="project-card">
+  <div class="project-card__header">
+    <h3 class="project-card__title">{title}</h3>
+    {href && (
+      <a href={href} class="project-card__link" target="_blank" rel="noopener noreferrer">
+        {linkLabel} &rarr;
+      </a>
+    )}
+  </div>
+  <p class="project-card__desc">{description}</p>
+  <ul class="project-card__highlights" role="list">
+    {highlights.map((item) => (
+      <li>{item}</li>
+    ))}
+  </ul>
+  <div class="project-card__stack">
+    {stack.map((tech) => (
+      <TechBadge name={tech} />
+    ))}
+  </div>
+</article>
+
+<style>
+  .project-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .project-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .project-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .project-card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .project-card__link {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .project-card__desc {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .project-card__highlights {
+    list-style: none;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .project-card__highlights li {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .project-card__highlights li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--terminal-green);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .project-card__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+</style>
