@@ -9,18 +9,18 @@ const socialLinks = [
 ];
 ---
 
-<footer class="footer">
-  <div class="container footer__inner">
-    <div class="footer__left">
-      <span class="footer__copyright">
-        <span class="footer__prompt">$</span> echo &copy; {currentYear} Faatikh Riziq
+<footer class="relative z-10 mt-auto border-t border-white/10 bg-canvas/45 py-8 backdrop-blur">
+  <div class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-5 px-6 text-center sm:px-8 md:flex-row md:text-left">
+    <div>
+      <span class="font-mono text-xs text-muted">
+        <span class="text-mint">$</span> echo &copy; {currentYear} Faatikh Riziq
       </span>
     </div>
-    <nav class="footer__links" aria-label="Social links">
+    <nav class="flex flex-wrap justify-center gap-3" aria-label="Social links">
       {socialLinks.map(({ href, label }) => (
         <a
           href={href}
-          class="footer__link"
+          class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs text-muted transition hover:border-amber/45 hover:text-amber"
           target={href.startsWith('mailto') ? undefined : '_blank'}
           rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
           aria-label={label}
@@ -31,53 +31,3 @@ const socialLinks = [
     </nav>
   </div>
 </footer>
-
-<style>
-  .footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem 0;
-    margin-top: auto;
-  }
-
-  .footer__inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .footer__copyright {
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-  }
-
-  .footer__prompt {
-    color: var(--terminal-green);
-  }
-
-  .footer__links {
-    display: flex;
-    gap: 1.5rem;
-  }
-
-  .footer__link {
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .footer__link:hover {
-    color: var(--accent);
-  }
-
-  @media (max-width: 480px) {
-    .footer__inner {
-      flex-direction: column;
-      text-align: center;
-    }
-  }
-</style>

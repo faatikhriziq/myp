@@ -6,9 +6,15 @@ interface Props {
   description: string;
   pubDate: Date;
   tags: string[];
+  readingTime: number;
+  headings?: Array<{
+    depth: number;
+    slug: string;
+    text: string;
+  }>;
 }
 
-const { title, description, pubDate, tags } = Astro.props;
+const { title, description, pubDate, tags, readingTime, headings = [] } = Astro.props;
 
 const formattedDate = pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
@@ -39,142 +45,137 @@ const blogPostingJsonLd = {
     '@id': Astro.url.href,
   },
   keywords: tags.join(', '),
+  timeRequired: `PT${readingTime}M`,
 };
+
+const sectionLabel = 'mb-3 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-amber';
+const hasToc = headings.length > 0;
 ---
 
-<BaseLayout title={`${title} — Faatikh Riziq`} description={description} jsonLd={blogPostingJsonLd}>
-  <article class="blog-post section">
-    <div class="container">
-      <header class="blog-post__header">
-        <div class="blog-post__meta">
+<BaseLayout
+  title={`${title} — Faatikh Riziq`}
+  description={description}
+  ogType="article"
+  publishedTime={pubDate}
+  tags={tags}
+  jsonLd={blogPostingJsonLd}
+>
+  <div class="fixed inset-x-0 top-16 z-[60] h-1 bg-white/10 shadow-[0_1px_12px_rgba(0,0,0,0.28)]">
+    <div class="h-full w-0 rounded-r-full bg-gradient-to-r from-amber via-cyan to-mint shadow-[0_0_18px_rgba(246,185,68,0.45)] transition-[width] duration-150 ease-out" data-reading-progress></div>
+  </div>
+  <article class="py-20 sm:py-28" data-reading-container>
+    <div class="mx-auto w-full max-w-6xl px-6 sm:px-8">
+      <header class="mb-12 border-b border-white/10 pb-10" data-reveal>
+        <span class={sectionLabel}><span class="text-subtle">//</span>Article</span>
+        <div class="mb-5 flex flex-wrap items-center gap-2 font-mono text-xs text-subtle">
           <time datetime={pubDate.toISOString()}>{formattedDate}</time>
-          <span class="blog-post__divider">|</span>
-          <div class="blog-post__tags">
+          <span class="text-white/15">|</span>
+          <span>{readingTime} min read</span>
+          <span class="text-white/15">|</span>
+          <div class="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span class="blog-post__tag">#{tag}</span>
+              <span class="text-amber">#{tag}</span>
             ))}
           </div>
         </div>
-        <h1 class="blog-post__title">{title}</h1>
-        <p class="blog-post__desc">{description}</p>
+        <h1 class="mb-4 max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl">{title}</h1>
+        <p class="max-w-3xl text-base leading-8 text-muted sm:text-lg">{description}</p>
       </header>
-      <div class="blog-post__content">
-        <slot />
+      <div class="grid gap-12 lg:grid-cols-[minmax(0,44rem)_16rem] lg:items-start">
+        <div class="min-w-0">
+          <div class="mb-6 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 font-mono text-xs text-subtle lg:hidden" data-reveal data-reveal-delay="80">
+            <span>Reading time</span>
+            <span class="text-amber">{readingTime} min</span>
+          </div>
+          <div class="max-w-3xl scroll-mt-24 text-muted [&_a]:text-amber [&_a]:underline [&_a]:underline-offset-4 [&_blockquote]:my-6 [&_blockquote]:border-l-2 [&_blockquote]:border-amber [&_blockquote]:pl-5 [&_blockquote]:italic [&_blockquote]:text-muted [&_h2]:group [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:scroll-mt-28 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-ink [&_h3]:group [&_h3]:mb-3 [&_h3]:mt-8 [&_h3]:scroll-mt-28 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-ink [&_li]:mb-2 [&_li]:leading-7 [&_ol]:mb-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-5 [&_p]:leading-8 [&_p_code]:rounded-md [&_p_code]:bg-white/[0.07] [&_p_code]:px-1.5 [&_p_code]:py-0.5 [&_p_code]:font-mono [&_p_code]:text-sm [&_p_code]:text-amber [&_pre]:mb-7 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-white/10 [&_pre]:bg-[#09101d]/90 [&_pre]:p-5 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:leading-7 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:mb-6 [&_ul]:list-disc [&_ul]:pl-6" data-reveal data-reveal-delay="120" data-article-content>
+            <slot />
+          </div>
+        </div>
+
+        {hasToc && (
+          <aside class="sticky top-24 hidden self-start lg:block" data-reveal data-reveal-delay="180">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur">
+              <p class="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-subtle">On this page</p>
+              <nav class="flex flex-col gap-2" aria-label="Table of contents">
+                {headings.map((heading) => (
+                  <a
+                    href={`#${heading.slug}`}
+                    class:list={[
+                      'rounded-lg py-1.5 font-mono text-xs leading-5 text-muted transition hover:text-amber',
+                      heading.depth === 3 ? 'pl-4' : 'pl-0',
+                    ]}
+                    data-toc-link={heading.slug}
+                  >
+                    {heading.text}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </aside>
+        )}
       </div>
-      <footer class="blog-post__footer">
-        <a href="/blog" class="blog-post__back">&larr; Back to all posts</a>
+      <footer class="mt-12 border-t border-white/10 pt-8">
+        <a href="/blog" class="font-mono text-sm text-amber transition hover:text-ink">&larr; Back to all posts</a>
       </footer>
     </div>
   </article>
+  <script>
+    const progress = document.querySelector<HTMLElement>('[data-reading-progress]');
+    const article = document.querySelector<HTMLElement>('[data-article-content]');
+    const readingContainer = document.querySelector<HTMLElement>('[data-reading-container]');
+    const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+    const headings = tocLinks
+      .map((link) => document.getElementById(link.dataset.tocLink ?? ''))
+      .filter((heading): heading is HTMLElement => Boolean(heading));
+
+    article?.querySelectorAll<HTMLElement>('h2[id], h3[id]').forEach((heading) => {
+      if (heading.querySelector('[data-heading-anchor]')) return;
+
+      const anchor = document.createElement('a');
+      anchor.href = `#${heading.id}`;
+      anchor.setAttribute('aria-label', `Copy link to ${heading.textContent ?? 'section'}`);
+      anchor.setAttribute('data-heading-anchor', '');
+      anchor.className = 'ml-2 !no-underline text-amber/0 transition group-hover:text-amber/60 hover:!text-amber';
+      anchor.textContent = '#';
+      anchor.addEventListener('click', () => {
+        navigator.clipboard?.writeText(anchor.href).catch(() => {});
+      });
+
+      heading.append(anchor);
+    });
+
+    const updateProgress = () => {
+      if (!progress || !readingContainer) return;
+
+      const rect = readingContainer.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      const read = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+      const percent = total <= 0 ? 100 : (read / total) * 100;
+
+      progress.style.width = `${percent}%`;
+    };
+
+    const setActiveHeading = () => {
+      if (headings.length === 0) return;
+
+      const active = headings.reduce((current, heading) => {
+        if (heading.getBoundingClientRect().top <= 140) return heading;
+        return current;
+      }, headings[0]);
+
+      tocLinks.forEach((link) => {
+        const isActive = link.dataset.tocLink === active.id;
+        link.classList.toggle('text-amber', isActive);
+        link.classList.toggle('text-muted', !isActive);
+      });
+    };
+
+    updateProgress();
+    setActiveHeading();
+    window.addEventListener('scroll', () => {
+      updateProgress();
+      setActiveHeading();
+    }, { passive: true });
+    window.addEventListener('resize', updateProgress);
+  </script>
 </BaseLayout>
-
-<style>
-  .blog-post__header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .blog-post__meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    color: var(--text-tertiary);
-    margin-bottom: 1rem;
-  }
-
-  .blog-post__divider {
-    color: var(--border);
-  }
-
-  .blog-post__tags {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .blog-post__tag {
-    color: var(--accent);
-  }
-
-  .blog-post__title {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
-    line-height: 1.2;
-  }
-
-  .blog-post__desc {
-    color: var(--text-secondary);
-    font-size: 1.0625rem;
-    line-height: 1.6;
-  }
-
-  .blog-post__content {
-    max-width: 720px;
-  }
-
-  .blog-post__content :global(h2) {
-    font-size: 1.375rem;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .blog-post__content :global(h3) {
-    font-size: 1.125rem;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .blog-post__content :global(p) {
-    margin-bottom: 1.25rem;
-    color: var(--text-secondary);
-    line-height: 1.75;
-  }
-
-  .blog-post__content :global(ul),
-  .blog-post__content :global(ol) {
-    margin-bottom: 1.25rem;
-    padding-left: 1.5rem;
-    color: var(--text-secondary);
-  }
-
-  .blog-post__content :global(li) {
-    margin-bottom: 0.375rem;
-    line-height: 1.7;
-  }
-
-  .blog-post__content :global(strong) {
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-
-  .blog-post__content :global(pre) {
-    margin-bottom: 1.5rem;
-  }
-
-  .blog-post__content :global(blockquote) {
-    border-left: 3px solid var(--accent);
-    padding-left: 1rem;
-    margin: 1.5rem 0;
-    color: var(--text-secondary);
-    font-style: italic;
-  }
-
-  .blog-post__footer {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .blog-post__back {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-  }
-
-  @media (max-width: 768px) {
-    .blog-post__title {
-      font-size: 1.5rem;
-    }
-  }
-</style>

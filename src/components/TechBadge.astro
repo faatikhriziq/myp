@@ -6,23 +6,6 @@ interface Props {
 const { name } = Astro.props;
 ---
 
-<span class="tech-badge">{name}</span>
-
-<style>
-  .tech-badge {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent);
-    background: var(--accent-muted);
-    padding: 0.25rem 0.625rem;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    transition: border-color 0.2s ease;
-    white-space: nowrap;
-  }
-
-  .tech-badge:hover {
-    border-color: var(--accent);
-  }
-</style>
+<span class="inline-flex whitespace-nowrap rounded-full border border-amber/20 bg-amber/10 px-3 py-1 font-mono text-xs font-medium text-amber shadow-[0_0_24px_rgba(246,185,68,0.08)] transition duration-200 hover:border-amber/55 hover:bg-amber/15">
+  {name}
+</span>

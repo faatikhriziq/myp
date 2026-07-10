@@ -4,6 +4,7 @@ const robotsTxt = `User-agent: *
 Allow: /
 
 Sitemap: https://faatikhriziq.my.id/sitemap-index.xml
+Host: https://faatikhriziq.my.id
 `;
 
 export const GET: APIRoute = () => {

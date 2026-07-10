@@ -5,23 +5,47 @@ import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const sectionLabel = 'mb-3 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-amber';
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://faatikhriziq.my.id';
+const blogJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Faatikh Riziq Blog',
+  url: `${siteUrl}/blog/`,
+  description: 'Thoughts on software engineering, system design, architecture decisions, and lessons from building production systems.',
+  author: {
+    '@type': 'Person',
+    name: 'Faatikh Riziq',
+  },
+  blogPost: posts.map((post) => ({
+    '@type': 'BlogPosting',
+    headline: post.data.title,
+    description: post.data.description,
+    datePublished: post.data.pubDate.toISOString(),
+    url: `${siteUrl}/blog/${post.id}/`,
+  })),
+};
 ---
 
 <BaseLayout
   title="Blog — Faatikh Riziq"
   description="Thoughts on software engineering, system design, architecture decisions, and lessons from building production systems."
+  jsonLd={blogJsonLd}
 >
-  <section class="section">
-    <div class="container">
-      <span class="section-label">Blog</span>
-      <h1 class="section-title">Writing</h1>
-      <p class="blog-index__intro">
-        Notes on engineering decisions, system design, and things I learn along the way.
-      </p>
+  <section class="py-20 sm:py-28">
+    <div class="mx-auto w-full max-w-4xl px-6 sm:px-8">
+      <div data-reveal>
+        <span class={sectionLabel}><span class="text-subtle">//</span>Blog</span>
+        <h1 class="mb-5 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Writing</h1>
+        <p class="mb-10 max-w-2xl text-base leading-8 text-muted">
+          Notes on engineering decisions, system design, and things I learn along the way.
+        </p>
+      </div>
       {posts.length === 0 ? (
-        <p class="blog-index__empty">No posts yet. Check back soon.</p>
+        <p class="font-mono text-sm text-subtle">No posts yet. Check back soon.</p>
       ) : (
-        <div class="blog-index__grid">
+        <div class="grid gap-4">
           {posts.map((post) => (
             <BlogCard
               title={post.data.title}
@@ -36,22 +60,3 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     </div>
   </section>
 </BaseLayout>
-
-<style>
-  .blog-index__intro {
-    color: var(--text-secondary);
-    margin-bottom: 2.5rem;
-    max-width: 520px;
-  }
-
-  .blog-index__empty {
-    color: var(--text-tertiary);
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-  }
-
-  .blog-index__grid {
-    display: grid;
-    gap: 1rem;
-  }
-</style>

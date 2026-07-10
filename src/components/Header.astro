@@ -9,183 +9,93 @@ const navLinks = [
 ];
 ---
 
-<header class="header">
-  <nav class="header__nav container">
-    <a href="/" class="header__logo" aria-label="Home">
-      <img src="/logo.svg" alt="Faatikh Riziq" class="header__logo-img" />
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-canvas/85 backdrop-blur-xl">
+  <nav class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6 sm:px-8">
+    <a href="/" class="flex items-center text-ink transition hover:opacity-80" aria-label="Home">
+      <img src="/logo.svg" alt="Faatikh Riziq" class="h-6 w-auto" />
     </a>
+
+    <ul class="hidden items-center gap-8 md:flex" role="list">
+      {
+        navLinks.map(({ href, label }) => {
+          const route = href.replace(/#.*/, "");
+          const isActive = route !== "/" && currentPath.startsWith(route);
+
+          return (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  "font-mono text-sm transition hover:text-amber",
+                  isActive ? "text-amber" : "text-muted",
+                ]}
+              >
+                {label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+
     <button
-      class="header__toggle"
+      class="inline-flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md border border-white/10 bg-white/5 md:hidden"
       aria-label="Toggle navigation"
       aria-expanded="false"
+      data-nav-toggle
     >
-      <span class="header__toggle-bar"></span>
-      <span class="header__toggle-bar"></span>
-      <span class="header__toggle-bar"></span>
+      <span class="block h-0.5 w-5 rounded-full bg-ink"></span>
+      <span class="block h-0.5 w-5 rounded-full bg-ink"></span>
+      <span class="block h-0.5 w-5 rounded-full bg-ink"></span>
     </button>
-    <ul class="header__links" role="list">
+  </nav>
+
+  <div
+    class="hidden border-t border-white/10 bg-canvas/95 px-6 py-4 md:hidden"
+    data-nav-menu
+  >
+    <nav class="mx-auto flex max-w-6xl flex-col gap-3" aria-label="Mobile navigation">
       {
-        navLinks.map(({ href, label }) => (
-          <li>
+        navLinks.map(({ href, label }) => {
+          const route = href.replace(/#.*/, "");
+          const isActive = route !== "/" && currentPath.startsWith(route);
+
+          return (
             <a
               href={href}
               class:list={[
-                "header__link",
-                {
-                  "header__link--active":
-                    currentPath.startsWith(href.replace(/#.*/, "")) &&
-                    href !== "/#about" &&
-                    href !== "/#projects" &&
-                    href !== "/#contact",
-                },
+                "rounded-lg px-2 py-2 font-mono text-sm transition hover:bg-white/5 hover:text-amber",
+                isActive ? "text-amber" : "text-muted",
               ]}
             >
               {label}
             </a>
-          </li>
-        ))
+          );
+        })
       }
-    </ul>
-  </nav>
+    </nav>
+  </div>
 </header>
 
-<style>
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    height: var(--header-height);
-    background: rgba(10, 10, 11, 0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .header__nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-  }
-
-  .header__logo {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .header__logo:hover {
-    opacity: 0.8;
-  }
-
-  .header__logo-img {
-    height: 24px;
-    width: auto;
-    object-fit: contain;
-  }
-
-  .header__toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-  }
-
-  .header__toggle-bar {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: var(--text-primary);
-    border-radius: 1px;
-    transition:
-      transform 0.2s ease,
-      opacity 0.2s ease;
-  }
-
-  .header__links {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-    align-items: center;
-  }
-
-  .header__link {
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s ease;
-    position: relative;
-  }
-
-  .header__link::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: var(--accent);
-    transition: width 0.2s ease;
-  }
-
-  .header__link:hover,
-  .header__link--active {
-    color: var(--accent);
-  }
-
-  .header__link:hover::after,
-  .header__link--active::after {
-    width: 100%;
-  }
-
-  @media (max-width: 768px) {
-    .header__toggle {
-      display: flex;
-    }
-
-    .header__links {
-      position: fixed;
-      top: var(--header-height);
-      left: 0;
-      right: 0;
-      bottom: 0;
-      flex-direction: column;
-      background: var(--bg-primary);
-      padding: 2rem;
-      gap: 1.5rem;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-    }
-
-    .header__links.is-open {
-      transform: translateX(0);
-    }
-
-    .header__link {
-      font-size: 1.125rem;
-    }
-  }
-</style>
-
 <script>
-  const toggle = document.querySelector(".header__toggle");
-  const links = document.querySelector(".header__links");
+  const toggle = document.querySelector("[data-nav-toggle]");
+  const menu = document.querySelector("[data-nav-menu]");
+
+  const closeMenu = () => {
+    menu?.classList.add("hidden");
+    toggle?.setAttribute("aria-expanded", "false");
+  };
 
   toggle?.addEventListener("click", () => {
-    const isOpen = links?.classList.toggle("is-open");
+    const isOpen = menu?.classList.toggle("hidden") === false;
     toggle.setAttribute("aria-expanded", String(isOpen));
   });
 
-  document.querySelectorAll(".header__link").forEach((link) => {
-    link.addEventListener("click", () => {
-      links?.classList.remove("is-open");
-      toggle?.setAttribute("aria-expanded", "false");
-    });
+  menu?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
   });
 </script>

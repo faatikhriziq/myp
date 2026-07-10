@@ -8,22 +8,108 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
-  jsonLd?: Record<string, unknown>;
+  canonicalUrl?: string;
+  ogType?: 'website' | 'article' | 'profile';
+  publishedTime?: Date | string;
+  modifiedTime?: Date | string;
+  tags?: string[];
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
-const { title, description, ogImage, jsonLd } = Astro.props;
+const { title, description, ogImage, canonicalUrl, ogType, publishedTime, modifiedTime, tags, jsonLd } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <SEOHead title={title} description={description} ogImage={ogImage} jsonLd={jsonLd} />
+    <SEOHead
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      canonicalUrl={canonicalUrl}
+      ogType={ogType}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      tags={tags}
+      jsonLd={jsonLd}
+    />
   </head>
-  <body>
+  <body class="relative flex min-h-dvh flex-col overflow-x-hidden bg-canvas font-sans text-ink antialiased selection:bg-amber selection:text-canvas">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.11)_1px,transparent_0)] opacity-35 [background-size:34px_34px]"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(246,185,68,0.28),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(103,215,255,0.2),transparent_30%),radial-gradient(circle_at_60%_80%,rgba(101,230,164,0.14),transparent_34%)]"></div>
+      <div class="absolute left-[8%] top-28 h-72 w-72 rounded-full bg-amber/18 blur-3xl motion-safe:animate-float-slow"></div>
+      <div class="absolute right-[6%] top-44 h-80 w-80 rounded-full bg-cyan/14 blur-3xl motion-safe:animate-float-slow [animation-delay:-7s]"></div>
+      <div class="absolute bottom-[-9rem] left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-mint/10 blur-3xl"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(7,10,18,0)_0%,rgba(7,10,18,0.72)_72%,#070a12_100%)]"></div>
+    </div>
     <Header />
-    <main id="main" style={`padding-top: var(--header-height)`}>
+    <main id="main" class="relative z-10 flex-1 pt-16">
       <slot />
     </main>
     <Footer />
+    <script>
+      const revealItems = document.querySelectorAll<HTMLElement>('[data-reveal]');
+
+      if (revealItems.length > 0) {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const reveal = (item: HTMLElement) => {
+          item.classList.remove('opacity-0', 'translate-y-8', 'blur-sm');
+          item.classList.add('opacity-100', 'translate-y-0', 'blur-0');
+          item.style.transitionDelay = '';
+          item.removeAttribute('data-reveal');
+
+          window.setTimeout(() => {
+            item.classList.remove(
+              'opacity-100',
+              'translate-y-0',
+              'blur-0',
+              'transition-all',
+              'duration-700',
+              'ease-out',
+              'will-change-transform',
+            );
+          }, 800);
+        };
+
+        if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+          revealItems.forEach(reveal);
+        } else {
+          revealItems.forEach((item, index) => {
+            const delay = item.dataset.revealDelay ?? String(Math.min(index * 70, 280));
+
+            item.style.transitionDelay = `${delay}ms`;
+            item.classList.add(
+              'opacity-0',
+              'translate-y-8',
+              'blur-sm',
+              'transition-all',
+              'duration-700',
+              'ease-out',
+              'will-change-transform',
+            );
+          });
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+
+                const item = entry.target as HTMLElement;
+                reveal(item);
+                observer.unobserve(item);
+              });
+            },
+            {
+              rootMargin: '0px 0px -8% 0px',
+              threshold: 0.16,
+            },
+          );
+
+          revealItems.forEach((item) => observer.observe(item));
+        }
+      }
+    </script>
   </body>
 </html>
