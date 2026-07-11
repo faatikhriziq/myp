@@ -22,6 +22,7 @@ const readingTime = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
   description={post.data.description}
   pubDate={post.data.pubDate}
   tags={post.data.tags}
+  ogImage={post.data.ogImage}
   readingTime={readingTime}
   headings={headings.filter((heading) => heading.depth === 2 || heading.depth === 3)}
 >

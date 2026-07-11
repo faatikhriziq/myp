@@ -3,6 +3,7 @@ title: "Building an ERP System with Modular Monolith Architecture"
 description: "Lessons learned from designing a production-grade ERP system using Go and PostgreSQL — with schema-per-module isolation, outbox pattern for reliable messaging, and modular boundaries that actually hold."
 pubDate: 2025-06-15
 tags: ["go", "postgresql", "architecture", "modular-monolith"]
+ogImage: "/blog/building-erp-with-modular-monolith.png"
 draft: false
 ---
 
