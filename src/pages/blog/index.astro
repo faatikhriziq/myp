@@ -6,6 +6,8 @@ import { getCollection } from 'astro:content';
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
+const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+
 const sectionLabel = 'mb-3 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-amber';
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://faatikhriziq.my.id';
 const blogJsonLd = {
@@ -42,10 +44,56 @@ const blogJsonLd = {
           Notes on engineering decisions, system design, and things I learn along the way.
         </p>
       </div>
+
+      <div class="mb-8 space-y-5" data-reveal data-reveal-delay="60">
+        <div class="relative">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search posts..."
+            class="w-full rounded-2xl border border-white/10 bg-white/[0.04] py-3 pl-11 pr-4 font-mono text-sm text-ink placeholder-subtle outline-none backdrop-blur transition focus:border-amber/45 focus:bg-white/[0.07] focus:ring-1 focus:ring-amber/20"
+            data-search-input
+          />
+        </div>
+
+        {allTags.length > 0 && (
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="font-mono text-xs text-subtle">Tags:</span>
+            <button
+              class="rounded-full border border-amber/30 bg-amber/15 px-3 py-1 font-mono text-xs text-amber transition hover:bg-amber/25"
+              data-tag-filter="all"
+              data-active="true"
+            >
+              All
+            </button>
+            {allTags.map((tag) => (
+              <button
+                class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs text-muted transition hover:border-amber/30 hover:text-amber"
+                data-tag-filter={tag}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div class="flex items-center justify-between font-mono text-xs text-subtle">
+          <span data-post-count>{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
+          <button
+            class="hidden text-amber transition hover:text-ink"
+            data-clear-filters
+          >
+            Clear filters
+          </button>
+        </div>
+      </div>
+
       {posts.length === 0 ? (
         <p class="font-mono text-sm text-subtle">No posts yet. Check back soon.</p>
       ) : (
-        <div class="grid gap-4">
+        <div class="grid gap-4" data-blog-list>
           {posts.map((post) => (
             <BlogCard
               title={post.data.title}
@@ -53,10 +101,95 @@ const blogJsonLd = {
               pubDate={post.data.pubDate}
               tags={post.data.tags}
               slug={post.id}
+              ogImage={post.data.ogImage}
             />
           ))}
         </div>
       )}
+
+      <p class="mt-8 hidden text-center font-mono text-sm text-subtle" data-no-results>
+        No posts match your search.
+      </p>
     </div>
   </section>
+
+  <script>
+    const searchInput = document.querySelector<HTMLInputElement>('[data-search-input]');
+    const tagButtons = document.querySelectorAll<HTMLButtonElement>('[data-tag-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('[data-blog-card]');
+    const postCount = document.querySelector<HTMLElement>('[data-post-count]');
+    const noResults = document.querySelector<HTMLElement>('[data-no-results]');
+    const clearBtn = document.querySelector<HTMLButtonElement>('[data-clear-filters]');
+    const blogList = document.querySelector<HTMLElement>('[data-blog-list]');
+
+    let activeTag = 'all';
+
+    const activeClass = ['border-amber/30', 'bg-amber/15', 'text-amber'];
+    const inactiveClass = ['border-white/10', 'bg-white/[0.04]', 'text-muted'];
+
+    function setActiveTag(tag: string) {
+      activeTag = tag;
+      tagButtons.forEach((btn) => {
+        const isActive = btn.dataset.tagFilter === tag;
+        btn.dataset.active = String(isActive);
+        if (isActive) {
+          btn.classList.remove(...inactiveClass);
+          btn.classList.add(...activeClass);
+        } else {
+          btn.classList.remove(...activeClass);
+          btn.classList.add(...inactiveClass);
+        }
+      });
+    }
+
+    function filterPosts() {
+      const query = searchInput?.value.toLowerCase().trim() ?? '';
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const title = card.dataset.title ?? '';
+        const tags = card.dataset.tags ?? '';
+        const desc = card.dataset.description ?? '';
+
+        const matchesSearch = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
+        const matchesTag = activeTag === 'all' || tags.split(',').includes(activeTag);
+        const show = matchesSearch && matchesTag;
+
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      if (postCount) {
+        postCount.textContent = `${visible} ${visible === 1 ? 'post' : 'posts'}`;
+      }
+
+      if (noResults) {
+        noResults.classList.toggle('hidden', visible > 0);
+      }
+
+      if (blogList) {
+        blogList.classList.toggle('hidden', visible === 0);
+      }
+
+      if (clearBtn) {
+        const hasFilters = query.length > 0 || activeTag !== 'all';
+        clearBtn.classList.toggle('hidden', !hasFilters);
+      }
+    }
+
+    searchInput?.addEventListener('input', filterPosts);
+
+    tagButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setActiveTag(btn.dataset.tagFilter ?? 'all');
+        filterPosts();
+      });
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      setActiveTag('all');
+      filterPosts();
+    });
+  </script>
 </BaseLayout>
