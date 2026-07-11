@@ -82,6 +82,16 @@ const hasToc = headings.length > 0;
         </div>
         <h1 class="mb-4 max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl">{title}</h1>
         <p class="max-w-3xl text-base leading-8 text-muted sm:text-lg">{description}</p>
+        {ogImage && (
+          <img
+            src={ogImage}
+            alt={title}
+            width="1200"
+            height="630"
+            class="mt-8 w-full rounded-2xl border border-white/10 shadow-2xl shadow-black/20"
+            loading="eager"
+          />
+        )}
       </header>
       <div class="grid gap-12 lg:grid-cols-[minmax(0,44rem)_16rem] lg:items-start">
         <div class="min-w-0">
